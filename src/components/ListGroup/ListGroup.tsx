@@ -1,4 +1,20 @@
 import {useState} from "react";
+import "./ListGroup.css";
+import styled from "styled-components";
+
+interface ListItemProps {
+    active: boolean;
+}
+
+const List = styled.ul`
+    list-style: none;
+    padding: 0;
+`
+
+const ListItem = styled.li<ListItemProps>`
+    padding: 5px 0;
+    background: ${props => props.active ? "blue" : "none"};
+`
 
 interface Props {
     cities: string[];
@@ -18,10 +34,10 @@ function ListGroup({cities, header, onSelectCity, buttonText}: Props) {
             <button type="button" className="btn btn-primary">{buttonText}</button>
             <h1>{header}</h1>
             {cities.length === 0 && <p>No items found</p>}
-            <ul className="list-group">
+            <List>
                 {cities.map((city, index) => (
-                    <li
-                        className={selectedIndex === index ? "list-group-item active" : "list-group-item"}
+                    <ListItem
+                        active={index === selectedIndex}
                         key={city}
                         onClick={() => {
                             setSelectedIndex(index);
@@ -29,9 +45,9 @@ function ListGroup({cities, header, onSelectCity, buttonText}: Props) {
                         }}
                     >
                         {city}
-                    </li>
+                    </ListItem>
                 ))}
-            </ul>
+            </List>
         </>
     );
 
