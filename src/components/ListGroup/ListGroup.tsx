@@ -20,10 +20,9 @@ interface Props {
     cities: string[];
     header: string;
     onSelectCity: ((city: string) => void);
-    buttonText: string;
 }
 
-function ListGroup({cities, header, onSelectCity, buttonText}: Props) {
+function ListGroup({cities, header, onSelectCity}: Props) {
 
 
     const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -31,7 +30,6 @@ function ListGroup({cities, header, onSelectCity, buttonText}: Props) {
 
     return (
         <>
-            <button type="button" className="btn btn-primary">{buttonText}</button>
             <h1>{header}</h1>
             {cities.length === 0 && <p>No items found</p>}
             <List>

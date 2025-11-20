@@ -1,0 +1,15 @@
+.like {
+    font-size: 50px;
+    padding: 10px;
+}
+
+.inactive {
+    color: transparent;
+    stroke: black;
+    stroke-width: 20;
+}
+
+.active {
+    color: red;
+    fill: red;
+}
