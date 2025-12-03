@@ -6,6 +6,7 @@ import alert from "./components/Alert";
 import {useState} from "react";
 import {FaCalendarAlt} from "react-icons/fa";
 import ExpandableText from "./components/ExpandableText";
+import Form from "./components/form";
 
 interface Props {
     buttonText: string;
@@ -62,6 +63,7 @@ function App() {
 
     return (
         <>
+            <Form/>
             <ExpandableText maxChars={charNumber}
             > adsfjklbadsfb asd asdklfjb asdf asldkbfj asldkbf </ExpandableText>
             {/*<button onClick={handleClick}>{expandedBtn}</button>*/}
