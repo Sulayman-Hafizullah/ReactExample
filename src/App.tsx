@@ -6,7 +6,8 @@ import alert from "./components/Alert";
 import {useState} from "react";
 import {FaCalendarAlt} from "react-icons/fa";
 import ExpandableText from "./components/ExpandableText";
-import Form from "./components/form";
+import Form from "./expense-tracker/components/form";
+import ExpenseList from "./expense-tracker/components/ExpenseList";
 
 interface Props {
     buttonText: string;
@@ -44,6 +45,10 @@ function App() {
             {id: 2, title: 'Product 2', quantity: 1}
         ]
     })
+    const [expenses, setExpenses] = useState([{id: 1, description: 'asdf', amount: 400, category: 'Groceries'},
+        {id: 2, description: 'bbb', amount: 400, category: 'Groceries'},
+        {id: 3, description: 'ccc', amount: 400, category: 'Groceries'},
+        {id: 4, description: 'ddd', amount: 400, category: 'Groceries'}]);
 
     const [maxChars, setMaxChars] = useState(false);
     const [ExpandableTextBtn, setExpandableTextBtn] = useState(false);
@@ -64,6 +69,8 @@ function App() {
     return (
         <>
             <Form/>
+            <ExpenseList expenses={expenses}
+                         onDelete={(id) => setExpenses(expenses.filter(expense => expense.id !== id))}/>
             <ExpandableText maxChars={charNumber}
             > adsfjklbadsfb asd asdklfjb asdf asldkbfj asldkbf </ExpandableText>
             {/*<button onClick={handleClick}>{expandedBtn}</button>*/}
