@@ -3,14 +3,21 @@ import Button from "./components/Button/Button";
 import Alert from "./components/Alert";
 import Like from "./components/Like/Like"
 import alert from "./components/Alert";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {FaCalendarAlt} from "react-icons/fa";
 import ExpandableText from "./components/ExpandableText";
 import Form from "./expense-tracker/components/form";
 import ExpenseList from "./expense-tracker/components/ExpenseList";
+import ExpenseFilter from "./expense-tracker/components/ExpenseFilter";
+import axios from "axios";
 
 interface Props {
     buttonText: string;
+}
+
+interface User {
+    id: number;
+    name: string;
 }
 
 function App() {
@@ -23,6 +30,29 @@ function App() {
     const handleSelectCity = (city: string) => {
         console.log(city);
     }
+
+    const [users, setUsers] = useState<User[]>([]);
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false)
+    useEffect(() => {
+        const controller = new AbortController();
+        // get-> await promise -> res / err
+        setIsLoading(true);
+        axios.get<User[]>('https://jsonplaceholder.typicode.com/users', {signal: controller.signal})
+            .then(response => {
+                setIsLoading(false);
+                setUsers(response.data)
+            })
+            .catch(err => {
+                if (axios.isCancel(err)) return;
+                setError(err.message)
+                setIsLoading(false);
+            });
+
+        return () => controller.abort();
+    }, [])
+
+    console.log(users);
 
     const [showAlert, setShowAlert] = useState(false);
 
@@ -52,6 +82,7 @@ function App() {
 
     const [maxChars, setMaxChars] = useState(false);
     const [ExpandableTextBtn, setExpandableTextBtn] = useState(false);
+    const [category, setCategory] = useState("")
 
     const handleClick = () => {
         //setGame({...game, player: {...game.player, name: "Jane"}});
@@ -64,12 +95,52 @@ function App() {
 
     const expandedBtn = ExpandableTextBtn ? 'Less' : 'More';
     const charNumber = maxChars ? 100 : 10;
+    const filteredExpenses = category ? expenses.filter(e => e.category === category) : expenses;
 
+
+    const deleteUser = (user: User) => {
+        const originalUsers = [...users];
+        setUsers(users.filter(u => u.id !== user.id))
+        axios.delete(`https://jsonplaceholder.typicode.com/users/` + user.id)
+            .catch(err => {
+                setUsers(originalUsers);
+                setError(err.message)
+            });
+    }
+    const addUser = () => {
+        const originalUsers = [...users];
+        const newUser = {id: 0, name: "Sulayman"};
+        setUsers([...users, newUser]);
+
+        axios.post('https://jsonplaceholder.typicode.com/users', newUser)
+            .then(response => {
+                setUsers([response.data, ...users])
+            })
+            .catch(err => {
+                setError(err.message)
+                setUsers(originalUsers);
+            });
+    }
 
     return (
         <>
-            <Form/>
-            <ExpenseList expenses={expenses}
+            {error && <p>{error}</p>}
+            {isLoading && <div className="spinner-border"></div>}
+            <button className="btn btn-primary mb-3" onClick={() => addUser()}>Add</button>
+            <ul className="list-group">
+                {users.map(user => <li className={"list-group-item d-flex justify-content-between"}
+                                       key={user.id}>{user.name}
+                    <button className="btn btn-outline-danger" onClick={() => deleteUser(user)}>Delete</button>
+                </li>)}
+            </ul>
+            <div className="mb-5">
+                <Form onSubmit={expense => setExpenses([...expenses, {...expense, id: expenses.length + 1}])}/>
+            </div>
+
+            <div className="mb-3">
+                <ExpenseFilter onSelectCategory={category => setCategory(category)}></ExpenseFilter>
+            </div>
+            <ExpenseList expenses={filteredExpenses}
                          onDelete={(id) => setExpenses(expenses.filter(expense => expense.id !== id))}/>
             <ExpandableText maxChars={charNumber}
             > adsfjklbadsfb asd asdklfjb asdf asldkbfj asldkbf </ExpandableText>

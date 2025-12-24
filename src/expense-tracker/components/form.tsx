@@ -2,23 +2,33 @@ import react, {FormEvent, useRef, useState} from 'react';
 import {FieldValue, FieldValues, useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
+import {categories} from "../categories";
 
 const schema = z.object({
     description: z.string().min(3, "Description must be at least 3 characters long."),
     amount: z.number({invalid_type_error: 'Price field is required.'}).min(1, "Price must be greater than 1"),
-    category: z.enum(["Groceries", "Entertainment", "Utilities"])
+    category: z.enum(categories)
 });
 
 type FormData = z.infer<typeof schema>;
-const Form = () => {
+
+interface Props {
+    onSubmit: (data: FormData) => void;
+}
+
+const Form = ({onSubmit}: Props) => {
 
     const nameRef = useRef<HTMLInputElement>(null);
     const ageRef = useRef<HTMLInputElement>(null);
 
-    const {register, handleSubmit, formState: {errors, isValid}} = useForm<FormData>({resolver: zodResolver(schema)});
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: {errors, isValid}
+    } = useForm<FormData>({resolver: zodResolver(schema)});
     console.log(errors);
 
-    const onSubmit = (data: FieldValues) => console.log(data);
 
     // const handleSubmit = (event: FormEvent) => {
     //     event.preventDefault()
@@ -31,7 +41,10 @@ const Form = () => {
     //     console.log(person1);
     // }
     return (
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(data => {
+            onSubmit(data);
+            reset();
+        })}>
             <div className="mb-3">
                 <label htmlFor="description" className="form-label">Description</label>
                 <input {...register("description")}
@@ -58,9 +71,7 @@ const Form = () => {
                         id="category"
                         className="form-control">
                     <option value=""> Select a Category</option>
-                    <option value="Groceries"> Groceries</option>
-                    <option value="Entertainment"> Entertainment</option>
-                    <option value="Utilities"> Utilities</option>
+                    {categories.map(category => <option key={category} value={category}>{category}</option>)}
                 </select>
             </div>
             <button className="btn btn-primary">Submit</button>
