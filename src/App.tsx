@@ -12,6 +12,7 @@ import ExpenseFilter from "./expense-tracker/components/ExpenseFilter";
 import apiClient, {CanceledError} from "./services/api-client";
 import UserService, {User} from "./services/user-service";
 import userService from "./services/user-service";
+import useUsers from "./hooks/useUsers";
 
 interface Props {
     buttonText: string;
@@ -73,27 +74,7 @@ function App() {
     const charNumber = maxChars ? 100 : 10;
     const filteredExpenses = category ? expenses.filter(e => e.category === category) : expenses;
 
-
-    const [users, setUsers] = useState<User[]>([]);
-    const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false)
-    useEffect(() => {
-        const controller = new AbortController();
-        // get-> await promise -> res / err
-        setIsLoading(true);
-        const {request, cancel} = userService.getAllUsers()
-        request.then(response => {
-            setIsLoading(false);
-            setUsers(response.data)
-        })
-            .catch(err => {
-                if (err instanceof CanceledError) return;
-                setError(err.message)
-                setIsLoading(false);
-            });
-
-        return () => cancel();
-    }, [])
+    const {users, isLoading, error, setUsers, setError} = useUsers();
 
     console.log(users);
 
